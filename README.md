@@ -4,7 +4,7 @@
 
 **Стек:** Vite + React + TypeScript, статический SPA. Данные отдаёт Make webhook (`VITE_API_URL`).
 
-**Демо:** https://ruslanduck.github.io/forte-europe-portal/ — работает на тестовых данных, вход `demo@forteeurope.test` / `demo`.
+**Демо:** https://duck-agency.com/forte-europe-portal/ — работает на тестовых данных, вход `demo@forteeurope.test` / `demo`.
 
 ## Запуск
 
