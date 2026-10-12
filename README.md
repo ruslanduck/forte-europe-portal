@@ -4,7 +4,7 @@
 
 **Стек:** Vite + React + TypeScript, статический SPA. Данные отдаёт Make webhook (`VITE_API_URL`).
 
-**Демо:** https://duck-agency.com/forte-europe-portal/ — работает на тестовых данных, вход `demo@forteeurope.test` / `demo`.
+**Сайт:** https://duck-agency.com/forte-europe-portal/ — работает на реальных данных через Make (`.env.production`).
 
 ## Запуск
 
@@ -13,7 +13,7 @@ npm install
 npm run dev
 ```
 
-Без `VITE_API_URL` портал работает на тестовых данных из `src/api/mock.ts`.
+Локально без `VITE_API_URL` портал работает на тестовых данных из `src/api/mock.ts` (вход `demo@forteeurope.test` / `demo`).
 
 Чтобы подключить Make:
 1. Скопируй `.env.example` в `.env`.

@@ -17,7 +17,7 @@ export function DealPage() {
       <Header dealId={dealId} />
       <main className="container page">
         {error && <ErrorMessage message={error} />}
-        {!deal && !error && <Loading />}
+        {!deal && !error && <Loading label="Preparing your programme… this can take a few seconds" />}
         {deal && (
           <>
             <section className="hero">

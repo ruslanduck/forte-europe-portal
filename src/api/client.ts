@@ -10,17 +10,15 @@ export class ApiError extends Error {
 }
 
 // Every request goes to one Make webhook; the `action` field selects the route.
-async function call<T>(action: string, payload: Record<string, unknown>, token?: string): Promise<T> {
+// Sent as a form post with the token in the body: a "simple" CORS request, so no preflight.
+async function call<T>(action: string, payload: Record<string, string | undefined>, token?: string): Promise<T> {
   if (!API_URL) return mockApi(action, payload, token) as Promise<T>
 
-  const res = await fetch(API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify({ action, ...payload }),
-  })
+  const form = new URLSearchParams({ action })
+  if (token) form.set('token', token)
+  for (const [key, value] of Object.entries(payload)) if (value != null) form.set(key, value)
+
+  const res = await fetch(API_URL, { method: 'POST', body: form })
   const body = await res.json().catch(() => ({}))
   if (!res.ok || body.error) {
     throw new ApiError(body.error ?? `Request failed (${res.status})`, res.status)
