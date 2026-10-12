@@ -63,7 +63,7 @@ export interface EventDetail {
 
 export interface Session {
   token: string
-  contact: { id: string; name: string; email: string }
+  contact: { id: string; name: string; email: string; role?: 'client' | 'admin' }
 }
 
 export interface CostRow {
@@ -73,13 +73,34 @@ export interface CostRow {
   unit?: string
   unitPrice?: number // omitted when the deal hides prices
   total?: number
+  vatRate?: number // percent, only when the deal shows VAT
+  admin?: AdminCostFields // staff only
 }
+
+export interface AdminCostFields {
+  unitCostNet: number
+  totalCostNet: number
+  costVat: number
+  unitCostGross: number
+  totalCostGross: number
+  markup: number
+  unitPriceNet: number
+  totalPriceNet: number
+  priceVat: number
+  unitPriceGross: number
+  totalPriceGross: number
+  profit: number
+}
+
+export type AdminTotals = Partial<Record<'totalCostNet' | 'totalCostGross' | 'totalPriceNet' | 'totalPriceGross' | 'profit', number>>
 
 export interface CostSection {
   id: string
   name: string
+  date?: string
   cancelled: boolean // cancelled schedules stay visible but count as 0
   rows: CostRow[]
+  adminTotals?: AdminTotals
   subtotal?: number // only when the deal shows subtotals
 }
 
@@ -90,4 +111,14 @@ export interface Costing {
   showPrices: boolean
   sections: CostSection[]
   grandTotal?: number // only when the deal shows the grand total
+  adminTotals?: AdminTotals // staff only
+  meta: {
+    code?: string
+    created?: string
+    startDate?: string
+    endDate?: string
+    destination?: string
+    contact?: string
+    client?: string
+  }
 }

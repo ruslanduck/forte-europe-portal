@@ -12,6 +12,7 @@ export function Header({ dealId }: { dealId?: string }) {
           <Logo />
         </Link>
         <div className="header-actions">
+          {session?.contact.role === 'admin' && <span className="admin-badge" title={session.contact.email}>Admin</span>}
           {dealId && <DealSwitcher currentId={dealId} />}
           {session && (
             <button className="btn-ghost" onClick={logout} title={session.contact.email}>

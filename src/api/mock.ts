@@ -116,7 +116,7 @@ export async function mockApi(action: string, payload: Record<string, unknown>, 
       const sections = demoCosting.map((s) => {
         const rows = s.rows.map(([name, qty, unit, price]) => ({
           id: `${s.id}-${name}`, name, qty, unit,
-          ...(hidePrices ? {} : { unitPrice: price, total: s.cancelled ? 0 : qty * price }),
+          ...(hidePrices ? {} : { unitPrice: price, total: s.cancelled ? 0 : qty * price, ...(showVat ? { vatRate: 10 } : {}) }),
         }))
         const subtotal = s.cancelled ? 0 : s.rows.reduce((sum, [, qty, , price]) => sum + qty * price, 0)
         return { id: s.id, name: s.name, cancelled: !!s.cancelled, rows, ...(showSubtotals && !hidePrices ? { subtotal } : {}), _sum: subtotal }
@@ -124,6 +124,7 @@ export async function mockApi(action: string, payload: Record<string, unknown>, 
       const grandTotal = sections.reduce((sum, s) => sum + s._sum, 0)
       return delay({ costing: {
         dealId: deal.id, title: deal.title, vatIncluded: showVat, showPrices: !hidePrices,
+        meta: { code: 'DEMO-1', client: deal.preparedFor, contact: 'Demo Client', startDate: deal.startDate, endDate: deal.endDate, destination: deal.destination },
         sections: sections.map(({ _sum, ...s }) => s),
         ...(showGrandTotal && !hidePrices ? { grandTotal } : {}),
       } })
