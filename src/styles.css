@@ -95,7 +95,8 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round
   background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow);
   overflow: hidden; margin-bottom: 16px; display: flex; flex-direction: column;
 }
-.manager-photo { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; object-position: top; display: block; background: var(--purple-50); }
+.manager-photo { width: 100%; height: auto; display: block; background: var(--purple-50); }
+.manager-initials { aspect-ratio: 4 / 3; }
 .manager-initials { display: grid; place-items: center; font-size: 40px; font-weight: 700; color: var(--purple); }
 .manager-body { padding: 16px 18px 18px; }
 .manager-name { font-size: 17px; }
@@ -199,7 +200,7 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round
 @media (max-width: 559px) {
   .hero::after { width: 120px; height: 120px; right: -60px; top: -60px; border-width: 18px; }
   .manager { flex-direction: row; align-items: center; }
-  .manager-photo { width: 88px; height: 88px; aspect-ratio: auto; flex: none; margin: 14px 0 14px 14px; border-radius: 50%; }
+  .manager-photo { width: 88px; height: 88px; aspect-ratio: auto; object-fit: cover; object-position: top; flex: none; margin: 14px 0 14px 14px; border-radius: 50%; }
   .manager-initials { font-size: 26px; }
   .manager-body { padding: 14px 16px; min-width: 0; }
 }
