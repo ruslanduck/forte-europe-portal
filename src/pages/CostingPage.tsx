@@ -49,7 +49,7 @@ function Section({ section, showPrices }: { section: CostSection; showPrices: bo
 
 export function CostingPage() {
   const { dealId = '' } = useParams()
-  const { data, error } = useApi((t) => api.getCosting(t, dealId), [dealId])
+  const { data, error } = useApi((t) => api.getCosting(t, dealId), [dealId], { cacheKey: `costing:${dealId}` })
   const costing = data?.costing
   const hasCancelled = costing?.sections.some((s) => s.cancelled)
 

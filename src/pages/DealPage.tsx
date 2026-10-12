@@ -9,7 +9,7 @@ import { ErrorMessage, Loading } from '../components/Status'
 
 export function DealPage() {
   const { dealId = '' } = useParams()
-  const { data, error } = useApi((t) => api.getDeal(t, dealId), [dealId])
+  const { data, error } = useApi((t) => api.getDeal(t, dealId), [dealId], { cacheKey: `deal:${dealId}` })
   const deal = data?.deal
 
   return (

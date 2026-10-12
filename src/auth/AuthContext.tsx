@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
 import { api } from '../api/client'
+import { clearApiCache } from '../lib/useApi'
 import type { Session } from '../api/types'
 
 const STORAGE_KEY = 'fe-portal-session'
@@ -35,6 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const logout = useCallback(() => {
+    clearApiCache()
     try {
       localStorage.removeItem(STORAGE_KEY)
     } catch {
