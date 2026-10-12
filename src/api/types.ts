@@ -65,3 +65,29 @@ export interface Session {
   token: string
   contact: { id: string; name: string; email: string }
 }
+
+export interface CostRow {
+  id: string
+  name: string
+  qty?: number
+  unit?: string
+  unitPrice?: number // omitted when the deal hides prices
+  total?: number
+}
+
+export interface CostSection {
+  id: string
+  name: string
+  cancelled: boolean // cancelled schedules stay visible but count as 0
+  rows: CostRow[]
+  subtotal?: number // only when the deal shows subtotals
+}
+
+export interface Costing {
+  dealId: string
+  title: string
+  vatIncluded: boolean
+  showPrices: boolean
+  sections: CostSection[]
+  grandTotal?: number // only when the deal shows the grand total
+}

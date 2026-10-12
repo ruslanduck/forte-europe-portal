@@ -74,7 +74,26 @@ const scheduleHtml: Record<string, string> = {
   's-auersperg': '<p>Coaches pick the group up at the hotel at <strong>18:30</strong>. Dress code: cocktail.</p>',
 }
 
-const delay = <T,>(value: T) => new Promise<T>((r) => setTimeout(() => r(value), 250))
+type DemoRow = [name: string, qty: number, unit: string, price: number]
+const demoCosting: { id: string; name: string; cancelled?: boolean; rows: DemoRow[] }[] = [
+  { id: 'c-fb', name: 'Catering F&B', rows: [
+    ['Breakfast and light lunch / min. 20 pax billable', 20, 'per person', 74.5],
+    ['Equipment fee for the breakfast', 20, 'per person', 7.5],
+    ['Service and kitchen staff, time estimated (breakfast/lunch)', 1, 'flat fee', 1258],
+    ['Dinner: flying service / buffet as specified, min. 500 billable', 530, 'per person', 55],
+    ['Beverage package 2 hours: mineral water, juices, soft drinks, draft beer, wine, coffee & tea', 530, 'per person', 25.5],
+  ] },
+  { id: 'c-furniture', name: 'Catering Furniture', rows: [
+    ['White bar unit, LED-lit, including back panel, 4.5 running metres', 1, 'flat fee', 3132],
+    ['Niro bar table, 60 x 120 cm, top: white', 1, 'flat fee', 1318],
+    ['Transport', 1, 'flat fee', 6847.5],
+  ] },
+  { id: 'c-show', name: 'Evening show (cancelled by client)', cancelled: true, rows: [
+    ['Live saxophone show, 45 minutes', 1, 'flat fee', 2400],
+  ] },
+]
+
+const delay =<T,>(value: T) => new Promise<T>((r) => setTimeout(() => r(value), 250))
 
 function fail(message: string, status: number): never {
   throw Object.assign(new Error(message), { status })
@@ -91,6 +110,24 @@ export async function mockApi(action: string, payload: Record<string, unknown>, 
 
   const deal = deals.find((d) => d.id === payload.dealId)
   switch (action) {
+    case 'costing.get': {
+      if (!deal) fail('Deal not found', 404)
+      const { showVat, showSubtotals, showGrandTotal, hidePrices } = deal.settings
+      const sections = demoCosting.map((s) => {
+        const rows = s.rows.map(([name, qty, unit, price]) => ({
+          id: `${s.id}-${name}`, name, qty, unit,
+          ...(hidePrices ? {} : { unitPrice: price, total: s.cancelled ? 0 : qty * price }),
+        }))
+        const subtotal = s.cancelled ? 0 : s.rows.reduce((sum, [, qty, , price]) => sum + qty * price, 0)
+        return { id: s.id, name: s.name, cancelled: !!s.cancelled, rows, ...(showSubtotals && !hidePrices ? { subtotal } : {}), _sum: subtotal }
+      })
+      const grandTotal = sections.reduce((sum, s) => sum + s._sum, 0)
+      return delay({ costing: {
+        dealId: deal.id, title: deal.title, vatIncluded: showVat, showPrices: !hidePrices,
+        sections: sections.map(({ _sum, ...s }) => s),
+        ...(showGrandTotal && !hidePrices ? { grandTotal } : {}),
+      } })
+    }
     case 'deals.list':
       return delay({ deals: deals.map(({ id, title, startDate, endDate, destination, pax }) => ({ id, title, startDate, endDate, destination, pax })) })
     case 'deals.get':

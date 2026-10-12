@@ -12,3 +12,9 @@ export function formatRange(start?: string, end?: string) {
   if (!end || end === start) return yearFmt.format(parse(start))
   return `${shortFmt.format(parse(start))} – ${yearFmt.format(parse(end))}`
 }
+
+const moneyFmt = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'EUR', minimumFractionDigits: 2 })
+const qtyFmt = new Intl.NumberFormat('en-GB', { maximumFractionDigits: 2 })
+
+export const formatMoney = (value: number) => moneyFmt.format(value)
+export const formatQty = (value: number) => qtyFmt.format(value)

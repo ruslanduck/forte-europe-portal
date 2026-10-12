@@ -1,4 +1,4 @@
-import type { Deal, DealSummary, EventDetail, Session } from './types'
+import type { Costing, Deal, DealSummary, EventDetail, Session } from './types'
 import { mockApi } from './mock'
 
 const API_URL = import.meta.env.VITE_API_URL as string | undefined
@@ -30,6 +30,7 @@ export const api = {
   login: (email: string, password: string) => call<Session>('auth.login', { email, password }),
   listDeals: (token: string) => call<{ deals: DealSummary[] }>('deals.list', {}, token),
   getDeal: (token: string, dealId: string) => call<{ deal: Deal }>('deals.get', { dealId }, token),
+  getCosting: (token: string, dealId: string) => call<{ costing: Costing }>('costing.get', { dealId }, token),
   getEvent: (token: string, dealId: string, eventId: string, scheduleId?: string) =>
     call<{ event: EventDetail }>('events.get', { dealId, eventId, scheduleId }, token),
 }

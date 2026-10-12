@@ -203,3 +203,51 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round
   .manager-initials { font-size: 26px; }
   .manager-body { padding: 14px 16px; min-width: 0; }
 }
+
+/* Costing */
+.hero-compact { padding-top: 28px; padding-bottom: 28px; }
+.hero-note { margin: 12px 0 0; opacity: 0.85; font-size: 14px; position: relative; z-index: 1; }
+.cost-list { display: grid; gap: 16px; margin-top: 28px; }
+.cost-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; border-left: 4px solid var(--purple); }
+.cost-card-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 18px 20px 6px; }
+.cost-card-head h2 { font-size: 17px; font-weight: 700; }
+.cost-badge { font-size: 12px; font-weight: 700; color: var(--red-600); background: #fdecec; border-radius: 999px; padding: 3px 10px; }
+.cost-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.cost-table th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-2); font-weight: 700; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+.cost-table td { padding: 11px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.cost-table th:first-child, .cost-table td:first-child { padding-left: 20px; }
+.cost-table th:last-child, .cost-table td:last-child { padding-right: 20px; }
+.cost-table tbody tr:last-child td { border-bottom: 0; }
+.cost-table tbody tr:hover td { background: var(--bg); }
+.cost-table .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.cost-unit { color: var(--ink-2); min-width: 120px; }
+.cost-total { font-weight: 600; }
+.cost-subtotal {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  background: var(--purple); color: #fff; padding: 14px 20px; font-weight: 600;
+}
+.cost-subtotal strong { font-size: 17px; font-variant-numeric: tabular-nums; }
+.cost-card.is-cancelled { border-left-color: var(--red); }
+.cost-card.is-cancelled td { color: var(--red-600); text-decoration: line-through; text-decoration-color: rgba(212, 45, 45, 0.5); }
+.cost-card.is-cancelled .cost-subtotal { background: #fdecec; color: var(--red-600); }
+.cost-grand {
+  margin-top: 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+  background: var(--red); color: #fff; border-radius: var(--radius); padding: 20px 24px; font-weight: 700; font-size: 16px;
+}
+.cost-grand strong { font-size: 24px; font-variant-numeric: tabular-nums; }
+.cost-footnote, .cost-empty { margin-top: 16px; font-size: 13px; }
+
+/* Costing on phones: each row becomes a small card */
+@media (max-width: 639px) {
+  .cost-table thead { display: none; }
+  .cost-table, .cost-table tbody, .cost-table tr, .cost-table td { display: block; width: 100%; }
+  .cost-table tr { padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .cost-table tbody tr:last-child { border-bottom: 0; }
+  .cost-table td, .cost-table th:first-child, .cost-table td:first-child, .cost-table td:last-child { padding: 2px 0; border: 0; }
+  .cost-table td.cost-item { font-weight: 600; margin-bottom: 4px; }
+  .cost-table td[data-label] { display: flex; justify-content: space-between; gap: 12px; text-align: right; font-size: 13px; }
+  .cost-table td[data-label]::before { content: attr(data-label); color: var(--ink-2); text-align: left; }
+  .cost-table tbody tr:hover td { background: none; }
+  .cost-card-head { padding: 16px 16px 6px; }
+  .cost-subtotal { padding: 12px 16px; }
+}
