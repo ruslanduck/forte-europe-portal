@@ -18,8 +18,15 @@ async function call<T>(action: string, payload: Record<string, string | undefine
   if (token) form.set('token', token)
   for (const [key, value] of Object.entries(payload)) if (value != null) form.set(key, value)
 
-  const res = await fetch(API_URL, { method: 'POST', body: form })
-  const body = await res.json().catch(() => ({}))
+  // Make answers within ~15 s; never leave the page spinning if it does not answer at all.
+  let res: Response
+  try {
+    res = await fetch(API_URL, { method: 'POST', body: form, signal: AbortSignal.timeout(60_000) })
+  } catch {
+    throw new ApiError('The server is not responding. Please try again in a moment.', 0)
+  }
+  // A non-JSON reply (e.g. Make's plain "Accepted") means the scenario produced no answer.
+  const body = await res.json().catch(() => ({ error: 'Unexpected server response. Please try again.' }))
   if (!res.ok || body.error) {
     throw new ApiError(body.error ?? `Request failed (${res.status})`, res.status)
   }
