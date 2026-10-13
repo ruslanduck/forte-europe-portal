@@ -296,3 +296,21 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round
 .btn-outline:hover { background: var(--purple-50); }
 .btn:disabled { opacity: 0.6; cursor: default; }
 .admin-badge { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; background: var(--red); color: #fff; border-radius: 999px; padding: 3px 9px; }
+
+/* My Deals dialog */
+.modal-backdrop { position: fixed; inset: 0; background: rgba(29, 26, 34, 0.45); display: grid; place-items: start center; padding: 80px 16px 16px; z-index: 50; }
+.modal { width: 100%; max-width: 560px; background: var(--surface); border-radius: 16px; box-shadow: 0 24px 64px rgba(29, 26, 34, 0.3); overflow: hidden; }
+.modal-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--line); }
+.modal-head h2 { font-size: 18px; color: var(--purple); }
+.modal-close { background: none; border: 0; padding: 6px; border-radius: 8px; cursor: pointer; color: var(--ink-2); }
+.modal-close:hover { background: var(--bg); }
+.modal-close svg { width: 16px; height: 16px; display: block; }
+.deal-list { list-style: none; margin: 0; padding: 6px; max-height: 60vh; overflow-y: auto; }
+.deal-list button { width: 100%; text-align: left; font: inherit; font-size: 15px; background: none; border: 0; border-radius: 10px; padding: 12px 14px; cursor: pointer; color: var(--ink); }
+.deal-list li + li button { border-top: 1px solid var(--line); border-radius: 0; }
+.deal-list button:hover { background: var(--purple-50); border-radius: 10px; }
+.deal-list button.is-current { background: var(--purple-50); color: var(--purple); font-weight: 600; border-radius: 10px; }
+.pager { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 10px; border-top: 1px solid var(--line); font-size: 14px; color: var(--ink-2); }
+.pager button { background: none; border: 0; padding: 6px; border-radius: 8px; cursor: pointer; color: var(--purple); }
+.pager button:disabled { color: var(--line); cursor: default; }
+.pager svg { width: 16px; height: 16px; display: block; }
