@@ -1,5 +1,5 @@
 // Local stand-in for the Make webhook so the portal runs without a backend.
-// Login: demo@forteeurope.test / demo
+// Login: demo@forteeurope.test / demo (client) or admin@forteeurope.test / demo (staff)
 import type { Deal, EventDetail } from './types'
 
 const TEAMO_IMG = 'https://api.teamo360.com/api/uploads/serve/b20b7b97-49eb-484d-ba7c-36a99d0eca16/images'
@@ -101,10 +101,12 @@ function fail(message: string, status: number): never {
 
 export async function mockApi(action: string, payload: Record<string, unknown>, token?: string): Promise<unknown> {
   if (action === 'auth.login') {
-    if (String(payload.email).toLowerCase() !== 'demo@forteeurope.test' || String(payload.password).toLowerCase() !== 'demo') {
+    const email = String(payload.email).toLowerCase()
+    if (!['demo@forteeurope.test', 'admin@forteeurope.test'].includes(email) || String(payload.password).toLowerCase() !== 'demo') {
       fail('Wrong login or password', 401)
     }
-    return delay({ token: 'mock-token', contact: { id: 'c1', name: 'Demo Client', email: 'demo@forteeurope.test' } })
+    const admin = email.startsWith('admin')
+    return delay({ token: 'mock-token', contact: { id: 'c1', name: admin ? 'Demo Staff' : 'Demo Client', email, role: admin ? 'admin' : 'client' } })
   }
   if (token !== 'mock-token') fail('Session expired', 401)
 
@@ -130,7 +132,7 @@ export async function mockApi(action: string, payload: Record<string, unknown>, 
       } })
     }
     case 'deals.list':
-      return delay({ deals: deals.map(({ id, title, startDate, endDate, destination, pax }) => ({ id, title, startDate, endDate, destination, pax })) })
+      return delay({ deals: deals.map(({ id, title, startDate, endDate, destination, pax }, i) => ({ id, title, startDate, endDate, destination, pax, code: `DEA-${100 - i}`, createdAt: `2026-09-${String(20 - i).padStart(2, '0')}T10:00:00Z` })) })
     case 'deals.get':
       if (!deal) fail('Deal not found', 404)
       return delay({ deal })

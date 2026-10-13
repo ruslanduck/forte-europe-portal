@@ -27,12 +27,15 @@ function preloadImages(html: string) {
 
 // Once a deal is open, quietly loads its costing, every event page and their first photos,
 // so switching between tabs is instant instead of waiting on the server each time.
+// Staff skip this: they flick through many deals, and warming up each one would burn Make operations
+// on pages nobody opens. Their pages load on demand and are cached the same way.
 export function usePrefetchDeal(dealId: string) {
   const { session } = useAuth()
   const token = session?.token
+  const isAdmin = session?.contact.role === 'admin'
 
   useEffect(() => {
-    if (!token || !dealId) return
+    if (!token || !dealId || isAdmin) return
     let stopped = false
     ;(async () => {
       const res = await prefetch(`deal:${dealId}`, () => api.getDeal(token, dealId))
@@ -54,5 +57,5 @@ export function usePrefetchDeal(dealId: string) {
     return () => {
       stopped = true
     }
-  }, [token, dealId])
+  }, [token, dealId, isAdmin])
 }

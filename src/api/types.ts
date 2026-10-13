@@ -17,6 +17,8 @@ export interface DealSummary {
   endDate?: string
   destination?: string
   pax?: number
+  code?: string // Teamo record id, e.g. DEA-18
+  createdAt?: string // ISO timestamp the deal was created in Teamo
 }
 
 export interface EventLink {
