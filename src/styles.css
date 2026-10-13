@@ -316,3 +316,54 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round
 .pager button { background: none; border: 0; padding: 6px; border-radius: 8px; cursor: pointer; color: var(--purple); }
 .pager button:disabled { color: var(--line); cursor: default; }
 .pager svg { width: 16px; height: 16px; display: block; }
+
+/* Full proposal */
+.proposal-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+.proposal-toolbar .back { margin-bottom: 0; }
+.proposal-label { margin-top: 36px; }
+.proposal-managers { display: grid; gap: 16px; }
+@media (min-width: 640px) { .proposal-managers { grid-template-columns: repeat(2, minmax(0, 320px)); } }
+.proposal-schedule { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; margin-top: 20px; border-left: 4px solid var(--purple); }
+@media (min-width: 768px) { .proposal-schedule { padding: 32px 40px; } }
+.proposal-schedule-head .eyebrow { color: var(--ink-2); margin-bottom: 4px; }
+.proposal-schedule-head h2 { font-size: clamp(20px, 3vw, 26px); color: var(--purple); }
+.proposal-note { margin-top: 16px; max-width: none; }
+.proposal-event { margin-top: 28px; }
+.proposal-event-name { font-size: 19px; margin: 0 0 12px; }
+.proposal-text { margin-top: 18px; max-width: none; }
+.proposal-plain { margin: 14px 0 0; padding-left: 1.2em; color: var(--ink-2); }
+.proposal-costing { margin-top: 44px; }
+.proposal-section-title { font-size: clamp(22px, 3vw, 28px); color: var(--purple); margin-bottom: 4px; }
+
+/* Print / Save as PDF: A4 pages, no app chrome, and nothing split across a page break. */
+@page { size: A4; margin: 14mm 12mm; }
+@media print {
+  :root { --bg: #fff; }
+  html, body { background: #fff; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .header, .footer, .no-print, .back { display: none !important; }
+  .container { max-width: none; padding: 0; }
+  .page { padding: 0; }
+  .app { min-height: 0; display: block; }
+  .proposal-programme-label { display: none; }
+  .proposal-managers { grid-template-columns: repeat(2, minmax(0, 260px)); }
+  /* Smaller E on paper, where the hero is narrower than on screen. */
+  .hero::after { height: auto; width: 110px; top: -16px; right: -18px; }
+  .proposal-schedule { box-shadow: none; border-radius: 0; padding: 0 0 0 16px; margin-top: 28px; }
+  .proposal-schedule.has-events { break-before: page; margin-top: 0; }
+  .proposal-costing { break-before: page; margin-top: 0; }
+  .cost-card, .manager, .event-card, .schedule-note { box-shadow: none; border: 1px solid var(--line); }
+  .manager-photo { max-height: 70mm; object-fit: cover; }
+  /* Atomic blocks move to the next page instead of being cut in two. */
+  .cost-grand { break-after: avoid; }
+  img, p, li, tr, blockquote, figure, table.rich-table, .manager, .cost-card-head, .cost-subtotal, .cost-grand,
+  .event-location, .proposal-schedule-head, .proposal-plain, .rich td, .rich th { break-inside: avoid; }
+  h1, h2, h3, h4, .proposal-event-name, .proposal-schedule-head, .cost-card-head { break-after: avoid; }
+  .event-gallery { break-inside: avoid; border-radius: 8px; }
+  .event-gallery img { max-height: 95mm; }
+  .event-gallery.count-1 img { max-height: 150mm; width: 100%; object-fit: cover; }
+  .rich img { max-height: 150mm; width: auto; max-width: 100%; }
+  .cost-table thead { display: table-header-group; }
+  .cost-table tbody tr:hover td { background: none; }
+  a { color: inherit; text-decoration: none; }
+}

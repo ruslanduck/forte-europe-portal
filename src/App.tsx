@@ -5,7 +5,7 @@ import { LoginPage } from './pages/LoginPage'
 import { HomeRedirect } from './pages/HomeRedirect'
 import { DealPage } from './pages/DealPage'
 import { EventPage } from './pages/EventPage'
-import { ComingSoon } from './pages/ComingSoon'
+import { ProposalPage } from './pages/ProposalPage'
 import { CostingPage } from './pages/CostingPage'
 
 function RequireAuth({ children }: { children: ReactElement }) {
@@ -21,7 +21,7 @@ export function App() {
         <Route path="/" element={<RequireAuth><HomeRedirect /></RequireAuth>} />
         <Route path="/deals/:dealId" element={<RequireAuth><DealPage /></RequireAuth>} />
         <Route path="/deals/:dealId/events/:eventId" element={<RequireAuth><EventPage /></RequireAuth>} />
-        <Route path="/deals/:dealId/proposal" element={<RequireAuth><ComingSoon title="Full proposal" /></RequireAuth>} />
+        <Route path="/deals/:dealId/proposal" element={<RequireAuth><ProposalPage /></RequireAuth>} />
         <Route path="/deals/:dealId/costing" element={<RequireAuth><CostingPage /></RequireAuth>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

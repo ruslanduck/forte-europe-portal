@@ -8,7 +8,7 @@ import { prefetch } from './useApi'
 const CONCURRENCY = 3
 const IMAGES_PER_EVENT = 4
 
-async function pool(tasks: (() => Promise<unknown>)[]) {
+export async function pool(tasks: (() => Promise<unknown>)[]) {
   let next = 0
   const worker = async () => {
     while (next < tasks.length) await tasks[next++]()
