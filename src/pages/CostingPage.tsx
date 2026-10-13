@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { api } from '../api/client'
 import type { CostSection } from '../api/types'
 import { useApi } from '../lib/useApi'
+import { usePrefetchDeal } from '../lib/prefetch'
 import { useAuth } from '../auth/AuthContext'
 import { downloadCostingExcel } from '../lib/costingExcel'
 import { formatMoney, formatQty } from '../lib/format'
@@ -56,6 +57,7 @@ export function CostingPage() {
   const { dealId = '' } = useParams()
   const { data, error } = useApi((t) => api.getCosting(t, dealId), [dealId], { cacheKey: `costing:${dealId}` })
   const costing = data?.costing
+  usePrefetchDeal(dealId)
   const hasCancelled = costing?.sections.some((s) => s.cancelled)
   const { session } = useAuth()
   const isAdmin = session?.contact.role === 'admin'

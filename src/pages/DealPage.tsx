@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api/client'
 import { useApi } from '../lib/useApi'
+import { usePrefetchDeal } from '../lib/prefetch'
 import { formatLongDate } from '../lib/format'
 import { Header } from '../components/Header'
 import { ManagerCard } from '../components/ManagerCard'
@@ -11,6 +12,7 @@ export function DealPage() {
   const { dealId = '' } = useParams()
   const { data, error } = useApi((t) => api.getDeal(t, dealId), [dealId], { cacheKey: `deal:${dealId}` })
   const deal = data?.deal
+  usePrefetchDeal(dealId)
 
   return (
     <>
