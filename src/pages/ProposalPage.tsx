@@ -4,6 +4,7 @@ import { api } from '../api/client'
 import type { Deal, EventDetail, Schedule } from '../api/types'
 import { useAuth } from '../auth/AuthContext'
 import { prefetch, useApi } from '../lib/useApi'
+import { useTrackView } from '../lib/trackView'
 import { pool } from '../lib/prefetch'
 import { sanitize, splitGallery } from '../lib/html'
 import { formatLongDate, formatShortDate } from '../lib/format'
@@ -129,6 +130,7 @@ export function ProposalPage() {
   const deal = data?.deal
   const costing = costingData?.costing
   const events = useProgrammeEvents(deal)
+  useTrackView(dealId)
   const [printing, setPrinting] = useState(false)
 
   const expected = deal ? deal.schedules.reduce((n, s) => n + s.events.filter((e) => e.hasDescription).length, 0) : 0

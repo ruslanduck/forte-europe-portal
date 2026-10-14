@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { api } from '../api/client'
 import { useApi } from '../lib/useApi'
+import { useTrackView } from '../lib/trackView'
 import { usePrefetchDeal } from '../lib/prefetch'
 import { sanitize, splitGallery } from '../lib/html'
 import { Header } from '../components/Header'
@@ -36,6 +37,7 @@ export function EventPage() {
   const { data: dealData } = useApi((t) => api.getDeal(t, dealId), [dealId], { cacheKey: `deal:${dealId}`, revalidate: false })
   const event = data?.event
   usePrefetchDeal(dealId)
+  useTrackView(dealId)
 
   const content = useMemo(() => (event ? splitGallery(event.descriptionHtml) : null), [event])
   const map = event && mapSrc(event)

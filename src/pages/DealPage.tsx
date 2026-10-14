@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api/client'
 import { useApi } from '../lib/useApi'
+import { useTrackView } from '../lib/trackView'
 import { usePrefetchDeal } from '../lib/prefetch'
 import { formatLongDate } from '../lib/format'
 import { Header } from '../components/Header'
@@ -13,6 +14,7 @@ export function DealPage() {
   const { data, error } = useApi((t) => api.getDeal(t, dealId), [dealId], { cacheKey: `deal:${dealId}` })
   const deal = data?.deal
   usePrefetchDeal(dealId)
+  useTrackView(dealId)
 
   return (
     <>

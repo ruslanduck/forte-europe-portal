@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api/client'
 import { useApi } from '../lib/useApi'
+import { useTrackView } from '../lib/trackView'
 import { usePrefetchDeal } from '../lib/prefetch'
 import { Header } from '../components/Header'
 import { CostingDownloads, CostingTables } from '../components/CostingView'
@@ -11,6 +12,7 @@ export function CostingPage() {
   const { data, error } = useApi((t) => api.getCosting(t, dealId), [dealId], { cacheKey: `costing:${dealId}` })
   const costing = data?.costing
   usePrefetchDeal(dealId)
+  useTrackView(dealId)
 
   return (
     <>

@@ -38,6 +38,7 @@ export const api = {
   listDeals: (token: string) => call<{ deals: DealSummary[] }>('deals.list', {}, token),
   getDeal: (token: string, dealId: string) => call<{ deal: Deal }>('deals.get', { dealId }, token),
   getCosting: (token: string, dealId: string) => call<{ costing: Costing }>('costing.get', { dealId }, token),
+  trackView: (token: string, dealId: string) => call<{ ok: boolean }>('deals.viewed', { dealId }, token),
   getEvent: (token: string, dealId: string, eventId: string, scheduleId?: string) =>
     call<{ event: EventDetail }>('events.get', { dealId, eventId, scheduleId }, token),
 }

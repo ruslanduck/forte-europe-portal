@@ -131,6 +131,8 @@ export async function mockApi(action: string, payload: Record<string, unknown>, 
         ...(showGrandTotal && !hidePrices ? { grandTotal } : {}),
       } })
     }
+    case 'deals.viewed':
+      return delay({ ok: true })
     case 'deals.list':
       return delay({ deals: deals.map(({ id, title, startDate, endDate, destination, pax }, i) => ({ id, title, startDate, endDate, destination, pax, code: `DEA-${100 - i}`, createdAt: `2026-09-${String(20 - i).padStart(2, '0')}T10:00:00Z` })) })
     case 'deals.get':
