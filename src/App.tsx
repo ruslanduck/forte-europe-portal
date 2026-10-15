@@ -1,4 +1,5 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import type { ReactElement } from 'react'
 import { useAuth } from './auth/AuthContext'
 import { LoginPage } from './pages/LoginPage'
@@ -13,9 +14,19 @@ function RequireAuth({ children }: { children: ReactElement }) {
   return session ? children : <Navigate to="/login" replace />
 }
 
+// A new page opens at the top, not at the scroll position of the page the user came from.
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+  return null
+}
+
 export function App() {
   return (
     <div className="app">
+      <ScrollToTop />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/" element={<RequireAuth><HomeRedirect /></RequireAuth>} />

@@ -384,3 +384,15 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round
 .deal-code, .deal-created { white-space: nowrap; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .deal-empty { padding: 20px 16px; margin: 0; }
 @media (max-width: 559px) { .deal-table th:nth-child(3), .deal-table td:nth-child(3) { display: none; } }
+
+/* Whole schedule card opens its first event */
+.schedule.is-clickable, .event-nav > ol > li.is-clickable { cursor: pointer; transition: box-shadow 0.15s, transform 0.15s; }
+.schedule.is-clickable:hover { box-shadow: 0 6px 20px rgba(92, 10, 150, 0.14); transform: translateY(-1px); }
+.event-nav > ol > li.is-clickable:hover { border-left-color: var(--purple-50); box-shadow: 0 4px 14px rgba(92, 10, 150, 0.12); }
+
+/* Loading placeholders shaped like the programme */
+.skeleton { border-radius: var(--radius); background: linear-gradient(90deg, #ece9f1 25%, #f5f3f8 50%, #ece9f1 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
+.skeleton-manager { height: 320px; }
+.skeleton-list { display: grid; gap: 12px; }
+.skeleton-schedule { height: 92px; }
+@media (max-width: 559px) { .skeleton-manager { height: 116px; } }
