@@ -9,7 +9,7 @@ export class ApiError extends Error {
   }
 }
 
-// Every request goes to one Make webhook; the `action` field selects the route.
+// Every request goes to one backend endpoint (Supabase Edge Function); the `action` field selects the route.
 // Sent as a form post with the token in the body: a "simple" CORS request, so no preflight.
 async function call<T>(action: string, payload: Record<string, string | undefined>, token?: string): Promise<T> {
   if (!API_URL) return mockApi(action, payload, token) as Promise<T>
@@ -18,14 +18,14 @@ async function call<T>(action: string, payload: Record<string, string | undefine
   if (token) form.set('token', token)
   for (const [key, value] of Object.entries(payload)) if (value != null) form.set(key, value)
 
-  // Make answers within ~15 s; never leave the page spinning if it does not answer at all.
+  // The backend answers in about a second; never leave the page spinning if it does not answer at all.
   let res: Response
   try {
     res = await fetch(API_URL, { method: 'POST', body: form, signal: AbortSignal.timeout(60_000) })
   } catch {
     throw new ApiError('The server is not responding. Please try again in a moment.', 0)
   }
-  // A non-JSON reply (e.g. Make's plain "Accepted") means the scenario produced no answer.
+  // A non-JSON reply means the backend produced no proper answer.
   const body = await res.json().catch(() => ({ error: 'Unexpected server response. Please try again.' }))
   if (!res.ok || body.error) {
     throw new ApiError(body.error ?? `Request failed (${res.status})`, res.status)

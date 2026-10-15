@@ -1,4 +1,4 @@
-// Local stand-in for the Make webhook so the portal runs without a backend.
+// Local stand-in for the backend so the portal runs without one.
 // Login: demo@forteeurope.test / demo (client) or admin@forteeurope.test / demo (staff)
 import type { Deal, EventDetail } from './types'
 
@@ -60,7 +60,7 @@ const deals: Deal[] = [
 const auerspergHtml = `<img src="${TEAMO_IMG}/5512dc37-f064-4f51-a7b6-4c0e68955108.png"><p>Palais Auersperg is one of Vienna's most elegant Baroque venues, offering a prestigious setting for corporate conferences, executive meetings, product launches, gala dinners and receptions. Located just minutes from the historic city centre, the palace combines over 300 years of history with modern event infrastructure.</p><h3>Highlights</h3><ul><li><strong>1,100 m²</strong> of flexible event space with natural daylight</li><li>Exclusive <strong>5,000 m² private palace garden</strong></li><li>Modern audiovisual technology</li></ul><p>With an exceptional central location, Palais Auersperg is one of Vienna's most sought-after venues for international corporate events.</p><img src="${TEAMO_IMG}/4c5a39cf-270a-438c-aadd-54e4347b0a9d.jpg">`
 
 const genericHtml = (name: string) =>
-  `<p><strong>${name}</strong> is one of our hand-picked venues. This placeholder text stands in for the description that Make pulls from the Inventory record in Teamo.</p><h3>What to expect</h3><ul><li>Private area reserved for the group</li><li>Set menu with local specialities</li><li>Drinks package on request</li></ul>`
+  `<p><strong>${name}</strong> is one of our hand-picked venues. This placeholder text stands in for the description pulled from the Inventory record in Teamo.</p><h3>What to expect</h3><ul><li>Private area reserved for the group</li><li>Set menu with local specialities</li><li>Drinks package on request</li></ul>`
 
 const locations: Record<string, string> = {
   'e-auersperg': 'Palais Auersperg Events, Auerspergstraße, Vienna, Austria',

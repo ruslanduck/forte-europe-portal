@@ -1,4 +1,4 @@
-// Shapes returned by the Make webhook. Keep in sync with docs/API_CONTRACT.md.
+// Shapes returned by the portal backend. Keep in sync with docs/API_CONTRACT.md.
 
 export interface Manager {
   id: string
