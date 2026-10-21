@@ -1,4 +1,6 @@
 import type { AdminCostFields, AdminTotals, Costing, CostRow } from '../api/types'
+import type { T } from '../i18n'
+import { formatLocale } from './format'
 
 // Excel export of the costing, laid out like the Bubble download: a header block with the
 // programme details, then one table per schedule with a subtotal row.
@@ -23,18 +25,19 @@ const CANCELLED_FILL = 'FFFDECEC'
 const CANCELLED_FONT = 'FFD42D2D'
 const GREY = 'FF808080'
 
-function clientColumns(c: Costing): Column[] {
+// Client columns follow the portal language; the internal (staff) file stays in English.
+function clientColumns(c: Costing, t: T): Column[] {
   const cols: Column[] = [
-    { key: 'qty', header: 'Qty', width: 8, kind: 'qty', value: (r) => r.qty },
-    { key: 'unit', header: 'Unit\nDescription', width: 18, kind: 'text', value: (r) => r.unit },
+    { key: 'qty', header: t('xl.qty'), width: 8, kind: 'qty', value: (r) => r.qty },
+    { key: 'unit', header: t('xl.unitDescription'), width: 18, kind: 'text', value: (r) => r.unit },
   ]
   if (c.showPrices) {
-    cols.push({ key: 'price', header: c.vatIncluded ? 'Unit Price\n(Incl Tax)\n€' : 'Unit Price\n€', width: 14, kind: 'money', value: (r) => r.unitPrice })
-    if (c.vatIncluded) cols.push({ key: 'vat', header: 'VAT %', width: 9, kind: 'pct', value: (r) => r.vatRate })
-    cols.push({ key: 'total', header: c.vatIncluded ? 'Total Price\n(Incl Tax)\n€' : 'Total Price\n€', width: 14, kind: 'money',
+    cols.push({ key: 'price', header: c.vatIncluded ? t('xl.unitPriceIncl') : t('xl.unitPrice'), width: 14, kind: 'money', value: (r) => r.unitPrice })
+    if (c.vatIncluded) cols.push({ key: 'vat', header: t('xl.vat'), width: 9, kind: 'pct', value: (r) => r.vatRate })
+    cols.push({ key: 'total', header: c.vatIncluded ? t('xl.totalPriceIncl') : t('xl.totalPrice'), width: 14, kind: 'money',
       value: (r) => r.total, total: 'client', formula: (at) => `${at('qty')}*${at('price')}` })
   }
-  cols.push({ key: 'comments', header: 'Comments', width: 24, kind: 'text', value: () => undefined })
+  cols.push({ key: 'comments', header: t('xl.comments'), width: 24, kind: 'text', value: () => undefined })
   return cols
 }
 
@@ -76,17 +79,17 @@ function numFmt(kind: Column['kind'], v: unknown) {
 }
 
 const fmtDate = (iso?: string) =>
-  iso ? new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(iso)) : ''
+  iso ? new Intl.DateTimeFormat(formatLocale(), { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(iso)) : ''
 const fmtStamp = (d: Date) =>
-  new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(d)
+  new Intl.DateTimeFormat(formatLocale(), { weekday: 'long', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(d)
 
-export async function downloadCostingExcel(costing: Costing, variant: 'client' | 'admin') {
+export async function downloadCostingExcel(costing: Costing, variant: 'client' | 'admin', t: T) {
   const { default: ExcelJS } = await import('exceljs')
   const wb = new ExcelJS.Workbook()
   wb.creator = 'Forte Europe'
   wb.calcProperties.fullCalcOnLoad = true
   const ws = wb.addWorksheet('Costing', { views: [{ showGridLines: false }] })
-  const cols = variant === 'admin' ? adminColumns() : clientColumns(costing)
+  const cols = variant === 'admin' ? adminColumns() : clientColumns(costing, t)
   const last = 2 + cols.length // column B holds the item names
 
   ws.getColumn(1).width = 3
@@ -104,16 +107,16 @@ export async function downloadCostingExcel(costing: Costing, variant: 'client' |
     cell.font = { color: { argb: GREY } }
     if (mergeTo) ws.mergeCells(row, col, row, mergeTo)
   }
-  ws.getCell(2, 2).value = variant === 'admin' ? 'Costing (internal)' : 'Costing'
+  ws.getCell(2, 2).value = variant === 'admin' ? t('xl.titleInternal') : t('xl.title')
   ws.getCell(2, 2).font = { size: 16, bold: true, color: { argb: 'FF5C0A96' } }
-  info(4, 2, `Downloaded: ${fmtStamp(new Date())}${m.created ? `  |  Created: ${fmtStamp(new Date(m.created))}` : ''}`, last)
-  info(6, 2, `Client: ${m.client ?? ''}`)
-  info(6, 3, `Program Name: ${costing.title}`, last)
-  info(7, 2, `Contact: ${m.contact ?? ''}`)
-  info(7, 3, `Program Code: ${m.code ?? ''}`, last)
-  info(8, 3, `Program Date: ${fmtDate(m.startDate)} - ${fmtDate(m.endDate)}`, last)
-  info(9, 3, `Destination(s): ${m.destination ?? ''}`, last)
-  if (variant === 'client' && costing.showPrices) info(10, 3, costing.vatIncluded ? 'Prices include VAT' : 'Prices exclude VAT', last)
+  info(4, 2, `${t('xl.downloaded')}: ${fmtStamp(new Date())}${m.created ? `  |  ${t('xl.created')}: ${fmtStamp(new Date(m.created))}` : ''}`, last)
+  info(6, 2, `${t('xl.client')}: ${m.client ?? ''}`)
+  info(6, 3, `${t('xl.programName')}: ${costing.title}`, last)
+  info(7, 2, `${t('xl.contact')}: ${m.contact ?? ''}`)
+  info(7, 3, `${t('xl.programCode')}: ${m.code ?? ''}`, last)
+  info(8, 3, `${t('xl.programDate')}: ${fmtDate(m.startDate)} - ${fmtDate(m.endDate)}`, last)
+  info(9, 3, `${t('xl.destinations')}: ${m.destination ?? ''}`, last)
+  if (variant === 'client' && costing.showPrices) info(10, 3, costing.vatIncluded ? t('xl.pricesIncl') : t('xl.pricesExcl'), last)
 
   const border = { bottom: { style: 'thin' as const, color: { argb: 'FFD9D2E3' } } }
   let r = 12
@@ -128,7 +131,7 @@ export async function downloadCostingExcel(costing: Costing, variant: 'client' |
       cell.alignment = { wrapText: true, vertical: 'middle', horizontal: col === 2 ? 'left' : 'center' }
       cell.border = border
     }
-    if (section.cancelled) head.getCell(2).value = `${head.getCell(2).value} (cancelled, not included in totals)`
+    if (section.cancelled) head.getCell(2).value = `${head.getCell(2).value} ${t('xl.cancelled')}`
     r++
 
     const first = r
@@ -183,7 +186,7 @@ export async function downloadCostingExcel(costing: Costing, variant: 'client' |
   const grand = cols.map((c) => (c.total === 'client' ? costing.grandTotal : c.total ? costing.adminTotals?.[c.total] : undefined))
   if (grand.some((t) => t != null)) {
     const row = ws.getRow(r)
-    row.getCell(2).value = 'Grand total'
+    row.getCell(2).value = t('xl.grandTotal')
     row.getCell(2).font = { bold: true, color: { argb: 'FFFFFFFF' } }
     for (let col = 2; col <= last; col++) {
       row.getCell(col).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF5C0A96' } }
@@ -201,7 +204,8 @@ export async function downloadCostingExcel(costing: Costing, variant: 'client' |
 
   const buffer = await wb.xlsx.writeBuffer()
   const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
-  const name = `${costing.title.replace(/[\\/:*?"<>|]+/g, ' ').trim()} - Costing${variant === 'admin' ? ' (internal)' : ''}.xlsx`
+  const title = costing.title.replace(/[\\/:*?"<>|]+/g, ' ').trim()
+  const name = `${t(variant === 'admin' ? 'xl.fileInternal' : 'xl.file', { title })}.xlsx`
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url

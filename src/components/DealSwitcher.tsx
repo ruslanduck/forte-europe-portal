@@ -3,17 +3,19 @@ import { useNavigate } from 'react-router-dom'
 import { api } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 import { useApi } from '../lib/useApi'
+import { formatCreated } from '../lib/format'
+import { useI18n } from '../i18n'
 
 const PAGE_SIZE = 10
 
-const created = (iso?: string) =>
-  iso ? new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(iso)) : '—'
+const created = (iso?: string) => (iso ? formatCreated(iso) : '—')
 
 // "My Deals": the signed-in contact's deals (newest first) in a paged dialog.
 // Staff see every deal in the system as a table with the Teamo id and creation date, plus search.
 export function DealSwitcher({ currentId }: { currentId: string }) {
   const { session } = useAuth()
   const isAdmin = session?.contact.role === 'admin'
+  const { t } = useI18n()
   const { data } = useApi((t) => api.listDeals(t), [], { cacheKey: 'deals' })
   const [open, setOpen] = useState(false)
   const [page, setPage] = useState(0)
@@ -51,14 +53,14 @@ export function DealSwitcher({ currentId }: { currentId: string }) {
   return (
     <>
       <button className="btn-ghost" onClick={() => setOpen(true)}>
-        {isAdmin ? 'All Deals' : 'My Deals'} <span className="badge">{deals.length}</span>
+        {isAdmin ? t('deals.all') : t('deals.my')} <span className="badge">{deals.length}</span>
       </button>
       {open && (
         <div className="modal-backdrop" onClick={() => setOpen(false)}>
           <div className={isAdmin ? 'modal modal-wide' : 'modal'} role="dialog" aria-modal="true" aria-labelledby="my-deals-title" onClick={(e) => e.stopPropagation()}>
             <header className="modal-head">
-              <h2 id="my-deals-title">{isAdmin ? 'All Deals' : 'My Deals'}</h2>
-              <button className="modal-close" onClick={() => setOpen(false)} aria-label="Close">
+              <h2 id="my-deals-title">{isAdmin ? t('deals.all') : t('deals.my')}</h2>
+              <button className="modal-close" onClick={() => setOpen(false)} aria-label={t('close')}>
                 <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" /></svg>
               </button>
             </header>
@@ -67,7 +69,7 @@ export function DealSwitcher({ currentId }: { currentId: string }) {
               <div className="deal-search">
                 <input
                   type="search"
-                  placeholder="Search by deal name or ID"
+                  placeholder={t('deals.search')}
                   value={query}
                   autoFocus
                   onChange={(e) => {
@@ -83,9 +85,9 @@ export function DealSwitcher({ currentId }: { currentId: string }) {
                 <table className="deal-table">
                   <thead>
                     <tr>
-                      <th scope="col">Deal name</th>
-                      <th scope="col">ID</th>
-                      <th scope="col">Created</th>
+                      <th scope="col">{t('deals.name')}</th>
+                      <th scope="col">{t('deals.id')}</th>
+                      <th scope="col">{t('deals.created')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -102,7 +104,7 @@ export function DealSwitcher({ currentId }: { currentId: string }) {
                     ))}
                   </tbody>
                 </table>
-                {visible.length === 0 && <p className="muted deal-empty">No deals match “{query}”.</p>}
+                {visible.length === 0 && <p className="muted deal-empty">{t('deals.noMatch', { query })}</p>}
               </div>
             ) : (
               <ul className="deal-list">
@@ -122,11 +124,11 @@ export function DealSwitcher({ currentId }: { currentId: string }) {
 
             {pages > 1 && (
               <nav className="pager" aria-label="Pages">
-                <button onClick={() => setPage((p) => p - 1)} disabled={page === 0} aria-label="Previous page">
+                <button onClick={() => setPage((p) => p - 1)} disabled={page === 0} aria-label={t('pager.prev')}>
                   <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" /></svg>
                 </button>
                 <span>{page + 1} / {pages}</span>
-                <button onClick={() => setPage((p) => p + 1)} disabled={page >= pages - 1} aria-label="Next page">
+                <button onClick={() => setPage((p) => p + 1)} disabled={page >= pages - 1} aria-label={t('pager.next')}>
                   <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" /></svg>
                 </button>
               </nav>

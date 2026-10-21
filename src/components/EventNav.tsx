@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import type { Schedule } from '../api/types'
 import { eventPath, useOpenFirstEvent } from './ScheduleCard'
+import { useI18n } from '../i18n'
 
 function ScheduleItem({ dealId, schedule, current, children }: { dealId: string; schedule: Schedule; current: boolean; children: ReactNode }) {
   const open = useOpenFirstEvent(dealId, schedule)
@@ -22,9 +23,10 @@ export function EventNav({ dealId, schedules, currentEventId, currentScheduleId 
   currentScheduleId?: string
 }) {
   const withEvents = schedules.filter((s) => s.events.length > 0)
+  const { t } = useI18n()
   return (
-    <nav className="event-nav" aria-label="Programme">
-      <h2 className="section-label">Programme</h2>
+    <nav className="event-nav" aria-label={t('deal.programme')}>
+      <h2 className="section-label">{t('deal.programme')}</h2>
       <ol>
         {withEvents.map((s) => (
           <ScheduleItem key={s.id} dealId={dealId} schedule={s} current={s.id === currentScheduleId}>

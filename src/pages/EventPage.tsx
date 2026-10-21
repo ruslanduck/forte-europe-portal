@@ -8,6 +8,7 @@ import { sanitize, splitGallery } from '../lib/html'
 import { Header } from '../components/Header'
 import { EventNav } from '../components/EventNav'
 import { ErrorMessage, Loading } from '../components/Status'
+import { contentLang, keys, useI18n } from '../i18n'
 
 // Map is shown only when the event has coordinates or an address.
 function mapSrc(event: { location?: string; lat?: number; lng?: number }) {
@@ -16,12 +17,13 @@ function mapSrc(event: { location?: string; lat?: number; lng?: number }) {
 }
 
 function BackLink({ dealId }: { dealId: string }) {
+  const { t } = useI18n()
   return (
     <Link className="back" to={`/deals/${dealId}`}>
       <svg viewBox="0 0 16 16" aria-hidden="true">
         <path d="M10 3L5 8l5 5" />
       </svg>
-      Back to programme
+      {t('back')}
     </Link>
   )
 }
@@ -30,11 +32,12 @@ export function EventPage() {
   const { dealId = '', eventId = '' } = useParams()
   const [params] = useSearchParams()
   const scheduleId = params.get('schedule') ?? undefined
-  const { data, error } = useApi((t) => api.getEvent(t, dealId, eventId, scheduleId), [dealId, eventId, scheduleId], {
-    cacheKey: `event:${dealId}:${scheduleId}:${eventId}`,
+  const { lang, t } = useI18n()
+  const { data, error } = useApi((tk) => api.getEvent(tk, dealId, eventId, scheduleId, contentLang(lang)), [dealId, eventId, scheduleId, lang], {
+    cacheKey: keys.event(dealId, scheduleId, eventId, lang),
   })
   // The programme on the left reuses the deal loaded by the home page when it is cached.
-  const { data: dealData } = useApi((t) => api.getDeal(t, dealId), [dealId], { cacheKey: `deal:${dealId}`, revalidate: false })
+  const { data: dealData } = useApi((tk) => api.getDeal(tk, dealId, contentLang(lang)), [dealId, lang], { cacheKey: keys.deal(dealId, lang), revalidate: false })
   const event = data?.event
   usePrefetchDeal(dealId)
   useTrackView(dealId)
@@ -84,14 +87,14 @@ export function EventPage() {
 
                 {event.schedule?.descriptionHtml && (
                   <section className="schedule-note">
-                    <h2 className="section-label">About this part of the programme</h2>
+                    <h2 className="section-label">{t('event.aboutSchedule')}</h2>
                     <div className="rich" dangerouslySetInnerHTML={{ __html: sanitize(event.schedule.descriptionHtml) }} />
                   </section>
                 )}
 
                 {map && (
                   <section className="event-map">
-                    <iframe title={`Map: ${event.name}`} src={map} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+                    <iframe title={t('event.map', { name: event.name })} src={map} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
                     <p className="event-location">
                       <svg viewBox="0 0 16 16" aria-hidden="true">
                         <path d="M8 15s5-4.5 5-8.5A5 5 0 0 0 3 6.5C3 10.5 8 15 8 15z" />

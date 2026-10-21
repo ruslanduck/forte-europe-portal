@@ -3,6 +3,7 @@ import { api } from '../api/client'
 import type { Deal } from '../api/types'
 import { useAuth } from '../auth/AuthContext'
 import { prefetch } from './useApi'
+import { contentLang, keys, useI18n } from '../i18n'
 
 // Requests at a time while warming up, so the backend is not hit with a whole programme at once.
 const CONCURRENCY = 3
@@ -30,23 +31,25 @@ function preloadImages(html: string) {
 export function usePrefetchDeal(dealId: string) {
   const { session } = useAuth()
   const token = session?.token
+  const { lang } = useI18n()
 
   useEffect(() => {
+    const cl = contentLang(lang)
     if (!token || !dealId) return
     let stopped = false
     ;(async () => {
-      const res = await prefetch(`deal:${dealId}`, () => api.getDeal(token, dealId))
+      const res = await prefetch(keys.deal(dealId, lang), () => api.getDeal(token, dealId, cl))
       const deal: Deal | undefined = res?.deal
       if (!deal || stopped) return
       const tasks: (() => Promise<unknown>)[] = [
-        () => prefetch(`costing:${dealId}`, () => api.getCosting(token, dealId)),
+        () => prefetch(keys.costing(dealId, lang), () => api.getCosting(token, dealId, cl)),
         () => prefetch('deals', () => api.listDeals(token)),
       ]
       for (const s of deal.schedules)
         for (const e of s.events.filter((x) => x.hasDescription))
           tasks.push(async () => {
             if (stopped) return
-            const r = await prefetch(`event:${dealId}:${s.id}:${e.id}`, () => api.getEvent(token, dealId, e.id, s.id))
+            const r = await prefetch(keys.event(dealId, s.id, e.id, lang), () => api.getEvent(token, dealId, e.id, s.id, cl))
             if (r?.event?.descriptionHtml && !stopped) preloadImages(r.event.descriptionHtml)
           })
       await pool(tasks)
@@ -54,5 +57,5 @@ export function usePrefetchDeal(dealId: string) {
     return () => {
       stopped = true
     }
-  }, [token, dealId])
+  }, [token, dealId, lang])
 }

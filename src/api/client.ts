@@ -36,9 +36,10 @@ async function call<T>(action: string, payload: Record<string, string | undefine
 export const api = {
   login: (email: string, password: string) => call<Session>('auth.login', { email, password }),
   listDeals: (token: string) => call<{ deals: DealSummary[] }>('deals.list', {}, token),
-  getDeal: (token: string, dealId: string) => call<{ deal: Deal }>('deals.get', { dealId }, token),
-  getCosting: (token: string, dealId: string) => call<{ costing: Costing }>('costing.get', { dealId }, token),
+  // lang: content language (es/fr); the backend returns Teamo texts translated. Omitted = English original.
+  getDeal: (token: string, dealId: string, lang?: string) => call<{ deal: Deal }>('deals.get', { dealId, lang }, token),
+  getCosting: (token: string, dealId: string, lang?: string) => call<{ costing: Costing }>('costing.get', { dealId, lang }, token),
   trackView: (token: string, dealId: string) => call<{ ok: boolean }>('deals.viewed', { dealId }, token),
-  getEvent: (token: string, dealId: string, eventId: string, scheduleId?: string) =>
-    call<{ event: EventDetail }>('events.get', { dealId, eventId, scheduleId }, token),
+  getEvent: (token: string, dealId: string, eventId: string, scheduleId?: string, lang?: string) =>
+    call<{ event: EventDetail }>('events.get', { dealId, eventId, scheduleId, lang }, token),
 }

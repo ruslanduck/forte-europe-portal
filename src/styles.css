@@ -200,7 +200,7 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round
 
 /* Phones: compact manager card, quieter hero ring */
 @media (max-width: 559px) {
-  .hero::after { right: -56px; opacity: 0.35; }
+  .hero::after { height: auto; width: 150px; top: -24px; right: -44px; opacity: 0.35; }
   .manager { flex-direction: row; align-items: center; }
   .manager-photo { width: 88px; height: 88px; aspect-ratio: auto; object-fit: cover; object-position: top; flex: none; margin: 14px 0 14px 14px; border-radius: 50%; }
   .manager-initials { font-size: 26px; }
@@ -396,3 +396,17 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round
 .skeleton-list { display: grid; gap: 12px; }
 .skeleton-schedule { height: 92px; }
 @media (max-width: 559px) { .skeleton-manager { height: 116px; } }
+
+/* Language switcher */
+.lang-switch { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 2px; background: var(--surface); }
+.lang-switch button { font: inherit; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; border: 0; background: none; color: var(--ink-2); padding: 4px 9px; border-radius: 999px; cursor: pointer; }
+.lang-switch button:hover { color: var(--purple); }
+.lang-switch button.is-active { background: var(--purple); color: #fff; }
+.login-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+/* Phones: the header holds logo mark, language, deals and log out on one line */
+@media (max-width: 559px) {
+  .header .logo-text { display: none; }
+  .header-actions { gap: 4px; }
+  .header-actions .lang-switch button { padding: 4px 6px; }
+  .header-actions .btn-ghost { padding-left: 8px; padding-right: 8px; font-size: 13px; }
+}

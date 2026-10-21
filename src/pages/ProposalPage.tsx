@@ -12,12 +12,12 @@ import { Header } from '../components/Header'
 import { ManagerCard } from '../components/ManagerCard'
 import { CostingDownloads, CostingTables } from '../components/CostingView'
 import { ErrorMessage, Loading } from '../components/Status'
+import { contentLang, keys, useI18n, type Lang } from '../i18n'
 
-const eventKey = (dealId: string, scheduleId: string, eventId: string) => `event:${dealId}:${scheduleId}:${eventId}`
 
 // Loads every event with a description (from the cache when the deal page already prefetched them).
 // undefined = still loading, null = failed.
-function useProgrammeEvents(deal: Deal | undefined) {
+function useProgrammeEvents(deal: Deal | undefined, lang: Lang) {
   const { session } = useAuth()
   const [events, setEvents] = useState<Record<string, EventDetail | null>>({})
   const token = session?.token
@@ -25,12 +25,13 @@ function useProgrammeEvents(deal: Deal | undefined) {
   useEffect(() => {
     if (!deal || !token) return
     let stopped = false
+    setEvents({})
     const tasks = deal.schedules.flatMap((s) =>
       s.events
         .filter((e) => e.hasDescription)
         .map((e) => async () => {
-          const key = eventKey(deal.id, s.id, e.id)
-          const res = await prefetch(key, () => api.getEvent(token, deal.id, e.id, s.id))
+          const key = keys.event(deal.id, s.id, e.id, lang)
+          const res = await prefetch(key, () => api.getEvent(token, deal.id, e.id, s.id, contentLang(lang)))
           if (!stopped) setEvents((prev) => ({ ...prev, [key]: res?.event ?? null }))
         }),
     )
@@ -38,7 +39,7 @@ function useProgrammeEvents(deal: Deal | undefined) {
     return () => {
       stopped = true
     }
-  }, [deal, token])
+  }, [deal, token, lang])
 
   return events
 }
@@ -87,10 +88,11 @@ function EventBlock({ event }: { event: EventDetail }) {
   )
 }
 
-function ScheduleBlock({ dealId, schedule, events }: { dealId: string; schedule: Schedule; events: Record<string, EventDetail | null> }) {
+function ScheduleBlock({ dealId, schedule, events, lang }: { dealId: string; schedule: Schedule; events: Record<string, EventDetail | null>; lang: Lang }) {
+  const { t } = useI18n()
   const described = schedule.events.filter((e) => e.hasDescription)
   const plain = schedule.events.filter((e) => !e.hasDescription)
-  const loaded = described.map((e) => events[eventKey(dealId, schedule.id, e.id)])
+  const loaded = described.map((e) => events[keys.event(dealId, schedule.id, e.id, lang)])
   // The schedule's own description comes with each of its events.
   const note = loaded.find((e) => e?.schedule?.descriptionHtml)?.schedule?.descriptionHtml
 
@@ -107,7 +109,7 @@ function ScheduleBlock({ dealId, schedule, events }: { dealId: string; schedule:
         ) : (
           <article key={e.id} className="proposal-event">
             <h3 className="proposal-event-name">{e.name}</h3>
-            {loaded[i] === undefined ? <Loading /> : <p className="muted">This description could not be loaded.</p>}
+            {loaded[i] === undefined ? <Loading /> : <p className="muted">{t('proposal.failed')}</p>}
           </article>
         ),
       )}
@@ -125,11 +127,15 @@ function ScheduleBlock({ dealId, schedule, events }: { dealId: string; schedule:
 // Everything about the proposal on one page, laid out so the browser's "Save as PDF" gives clean A4 pages.
 export function ProposalPage() {
   const { dealId = '' } = useParams()
-  const { data, error } = useApi((t) => api.getDeal(t, dealId), [dealId], { cacheKey: `deal:${dealId}` })
-  const { data: costingData, error: costingError } = useApi((t) => api.getCosting(t, dealId), [dealId], { cacheKey: `costing:${dealId}` })
+  const { lang, t } = useI18n()
+  const cl = contentLang(lang)
+  const { data, error } = useApi((tk) => api.getDeal(tk, dealId, cl), [dealId, lang], { cacheKey: keys.deal(dealId, lang) })
+  const { data: costingData, error: costingError } = useApi((tk) => api.getCosting(tk, dealId, cl), [dealId, lang], {
+    cacheKey: keys.costing(dealId, lang),
+  })
   const deal = data?.deal
   const costing = costingData?.costing
-  const events = useProgrammeEvents(deal)
+  const events = useProgrammeEvents(deal, lang)
   useTrackView(dealId)
   const [printing, setPrinting] = useState(false)
 
@@ -141,11 +147,11 @@ export function ProposalPage() {
   useEffect(() => {
     if (!deal) return
     const before = document.title
-    document.title = `${deal.title} – Forte Europe Proposal`
+    document.title = t('proposal.fileName', { title: deal.title })
     return () => {
       document.title = before
     }
-  }, [deal])
+  }, [deal, t])
 
   async function print() {
     setPrinting(true)
@@ -166,31 +172,31 @@ export function ProposalPage() {
             <svg viewBox="0 0 16 16" aria-hidden="true">
               <path d="M10 3L5 8l5 5" />
             </svg>
-            Back to programme
+            {t('back')}
           </Link>
           {deal && (
             <button className="btn btn-primary" onClick={print} disabled={!ready || printing}>
               <svg viewBox="0 0 20 20" aria-hidden="true">
                 <path d="M5 8V2h10v6M5 15H3V8h14v7h-2M5 12h10v6H5z" />
               </svg>
-              {!ready ? `Preparing… ${Math.min(done, expected)}/${expected}` : printing ? 'Loading photos…' : 'Print Proposal'}
+              {!ready ? t('proposal.progress', { done: Math.min(done, expected), total: expected }) : printing ? t('proposal.photos') : t('proposal.print')}
             </button>
           )}
         </div>
 
         {error && <ErrorMessage message={error} />}
-        {!deal && !error && <Loading label="Preparing your proposal… this can take a few seconds" />}
+        {!deal && !error && <Loading label={t('proposal.preparing')} />}
         {deal && (
           <>
             <section className="proposal-cover">
               <div className="hero">
-                <p className="eyebrow">Full proposal</p>
-                {deal.preparedFor && <p className="hero-for">Prepared exclusively for {deal.preparedFor}</p>}
+                <p className="eyebrow">{t('proposal.eyebrow')}</p>
+                {deal.preparedFor && <p className="hero-for">{t('deal.preparedFor', { name: deal.preparedFor })}</p>}
                 <h1 className="hero-title">{deal.title}</h1>
                 <dl className="hero-facts">
                   {deal.startDate && (
                     <div>
-                      <dt>Dates</dt>
+                      <dt>{t('deal.dates')}</dt>
                       <dd>
                         {formatLongDate(deal.startDate)}
                         {deal.endDate && deal.endDate !== deal.startDate && <> – {formatLongDate(deal.endDate)}</>}
@@ -199,14 +205,14 @@ export function ProposalPage() {
                   )}
                   {deal.destination && (
                     <div>
-                      <dt>Destination</dt>
+                      <dt>{t('deal.destination')}</dt>
                       <dd>{deal.destination}</dd>
                     </div>
                   )}
                   {deal.pax != null && (
                     <div>
-                      <dt>Guests</dt>
-                      <dd>{deal.pax} PAX</dd>
+                      <dt>{t('deal.guests')}</dt>
+                      <dd>{t('deal.pax', { n: deal.pax })}</dd>
                     </div>
                   )}
                 </dl>
@@ -214,7 +220,7 @@ export function ProposalPage() {
               {deal.managers.length > 0 && (
                 <>
                   <h2 className="section-label proposal-label">
-                    {deal.managers.length > 1 ? 'Your Forte Europe contacts' : 'Your Forte Europe contact'}
+                    {deal.managers.length > 1 ? t('deal.contacts') : t('deal.contact')}
                   </h2>
                   <div className="proposal-managers">
                     {deal.managers.map((m) => (
@@ -225,19 +231,19 @@ export function ProposalPage() {
               )}
             </section>
 
-            <h2 className="section-label proposal-label proposal-programme-label">Programme</h2>
+            <h2 className="section-label proposal-label proposal-programme-label">{t('deal.programme')}</h2>
             {deal.schedules.map((s) => (
-              <ScheduleBlock key={s.id} dealId={dealId} schedule={s} events={events} />
+              <ScheduleBlock key={s.id} dealId={dealId} schedule={s} events={events} lang={lang} />
             ))}
 
             <section className="proposal-costing">
-              <h2 className="proposal-section-title">Costing</h2>
+              <h2 className="proposal-section-title">{t('deal.costing')}</h2>
               {costingError && <ErrorMessage message={costingError} />}
               {!costing && !costingError && <Loading />}
               {costing && (
                 <>
                   {costing.showPrices && (
-                    <p className="muted">All prices in EUR, {costing.vatIncluded ? 'VAT included' : 'excluding VAT'}.</p>
+                    <p className="muted">{costing.vatIncluded ? t('costing.pricesIncl') : t('costing.pricesExcl')}</p>
                   )}
                   <CostingTables costing={costing} />
                   <CostingDownloads costing={costing} />

@@ -40,6 +40,7 @@ const deals: Deal[] = [
   {
     id: 'deal-vienna',
     title: '100002 Demo Group Vienna',
+    language: 'fr',
     preparedFor: 'Demo Travel Agency',
     startDate: '2026-11-07',
     endDate: '2026-11-11',
@@ -134,7 +135,7 @@ export async function mockApi(action: string, payload: Record<string, unknown>, 
     case 'deals.viewed':
       return delay({ ok: true })
     case 'deals.list':
-      return delay({ deals: deals.map(({ id, title, startDate, endDate, destination, pax }, i) => ({ id, title, startDate, endDate, destination, pax, code: `DEA-${100 - i}`, createdAt: `2026-09-${String(20 - i).padStart(2, '0')}T10:00:00Z` })) })
+      return delay({ deals: deals.map(({ id, title, startDate, endDate, destination, pax, language }, i) => ({ id, title, startDate, endDate, destination, pax, language, code: `DEA-${100 - i}`, createdAt: `2026-09-${String(20 - i).padStart(2, '0')}T10:00:00Z` })) })
     case 'deals.get':
       if (!deal) fail('Deal not found', 404)
       return delay({ deal })

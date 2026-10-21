@@ -2,9 +2,12 @@ import { useState, type FormEvent } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import { Logo } from '../components/Logo'
+import { LanguageSwitcher } from '../components/LanguageSwitcher'
+import { useI18n } from '../i18n'
 
 export function LoginPage() {
   const { session, login } = useAuth()
+  const { t } = useI18n()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -28,11 +31,14 @@ export function LoginPage() {
   return (
     <main className="login">
       <form className="login-card" onSubmit={onSubmit}>
-        <Logo />
-        <h1>Your event proposal</h1>
-        <p className="muted">Sign in with the login and password from your Forte Europe proposal.</p>
+        <div className="login-top">
+          <Logo />
+          <LanguageSwitcher />
+        </div>
+        <h1>{t('login.title')}</h1>
+        <p className="muted">{t('login.intro')}</p>
         <label>
-          Login
+          {t('login.login')}
           <input
             type="text"
             autoComplete="username"
@@ -44,7 +50,7 @@ export function LoginPage() {
           />
         </label>
         <label>
-          Password
+          {t('login.password')}
           <input
             type="password"
             autoComplete="current-password"
@@ -61,7 +67,7 @@ export function LoginPage() {
           </p>
         )}
         <button className="btn btn-primary" disabled={busy}>
-          {busy ? 'Signing in…' : 'Sign in'}
+          {busy ? t('login.busy') : t('login.submit')}
         </button>
       </form>
     </main>

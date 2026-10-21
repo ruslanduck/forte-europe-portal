@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
+import { useI18n } from './i18n'
 import type { ReactElement } from 'react'
 import { useAuth } from './auth/AuthContext'
 import { LoginPage } from './pages/LoginPage'
@@ -24,6 +25,7 @@ function ScrollToTop() {
 }
 
 export function App() {
+  const { t } = useI18n()
   return (
     <div className="app">
       <ScrollToTop />
@@ -38,7 +40,7 @@ export function App() {
       </Routes>
       <footer className="footer">
         <div className="container">
-          © {new Date().getFullYear()} Forte Europe. All rights reserved. This information is privileged and confidential.
+          {t('footer', { year: new Date().getFullYear() })}
         </div>
       </footer>
     </div>

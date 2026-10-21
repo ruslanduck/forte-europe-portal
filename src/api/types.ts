@@ -19,6 +19,7 @@ export interface DealSummary {
   pax?: number
   code?: string // Teamo record id, e.g. DEA-18
   createdAt?: string // ISO timestamp the deal was created in Teamo
+  language?: string // 'en' | 'es' | 'fr' from the deal's Language field
 }
 
 export interface EventLink {
