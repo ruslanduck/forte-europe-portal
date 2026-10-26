@@ -8,3 +8,5 @@ dist
 # Private: login scheme, Teamo column ids and the dev backend stay out of the public repo
 server/
 docs/
+
+.vercel

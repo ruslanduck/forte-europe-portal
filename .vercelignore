@@ -1,0 +1,10 @@
+# Private: dev backend, login scheme, Teamo ids and local secrets never go to Vercel
+server/
+docs/
+.env
+.env.local
+.env.*.local
+node_modules
+dist
+*.log
+vite.dev.config.ts

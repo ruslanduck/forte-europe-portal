@@ -2,9 +2,9 @@
 
 Клиентский портал Forte Europe. Клиент входит в личный кабинет и видит свои сделки: программу по дням, описания ивентов, а дальше — костинг и proposal.
 
-**Стек:** Vite + React + TypeScript, статический SPA. Данные отдаёт Make webhook (`VITE_API_URL`).
+**Стек:** Vite + React + TypeScript, статический SPA. Данные отдаёт backend по адресу из `VITE_API_URL`.
 
-**Сайт:** https://duck-agency.com/forte-europe-portal/ — работает на реальных данных через Make (`.env.production`).
+**Сайт:** хостится на Vercel (адрес backend берётся из `.env.production`).
 
 ## Запуск
 
@@ -30,8 +30,5 @@ src/components/ Header, DealSwitcher (My deals), ManagerCard, ScheduleCard
 
 ## Деплой
 
-```bash
-npm run deploy
-```
-
-Скрипт собирает сайт и публикует `dist/` в ветку `gh-pages`, откуда его раздаёт GitHub Pages.
+Vercel собирает сайт сам из ветки `main` при каждом push (Framework: Vite, Build: `npm run build`, Output: `dist`).
+Все пути отдают `index.html` (см. `vercel.json`), поэтому прямые ссылки вида `/deals/<id>` открываются.
